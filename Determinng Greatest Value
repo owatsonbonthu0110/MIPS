@@ -1,0 +1,86 @@
+#Create an assembly program that asks the user for 2 integer inputs and stores the values...
+#create a function that will sort the 2 integer inputs from greatest to least and add the values...
+#finally print out to the console the result in the following format:
+#Greatest Value + Least Value = Sum Result
+.data
+	prompt:  .asciiz "Enter your first number: "  #place two messages in ram
+	prompt2:  .asciiz "\nEnter your second number: "
+	message1: .asciiz "\nThe Greatest Value + Least Value = Sum Result\n " 
+	plus: .asciiz " + "
+	equal: .asciiz " = "
+	
+.text
+	main:
+	#load prompts to registers
+	#Prompt the user to enter number
+	li $v0, 4  #4 tells system to print text
+	la $a0, prompt #argument
+	syscall
+	#get the users integer
+	li $v0, 5  #5 to get an integer from the keyboard
+	syscall
+	#store the result in a1
+	move $a1, $v0
+	
+	#Prompt user to enter second number
+	li $v0, 4
+	la $a0, prompt2
+	syscall
+	#get the users second integer
+	li $v0, 5 #5 to get an integer from the keyboard
+	syscall
+	#store the 2nd number in a2
+	move $a2, $v0
+	
+	#Display message for either whitespace or to tell user something
+	li $v0, 4
+	la $a0, message1  #greatest value message
+	syscall
+	
+	
+	#Create function that will sort the 2 integer inputs from greatest to 
+	#least and add the values. 
+	jal sortValues
+	move $t1, $v1
+	move $t2, $v0
+	move $t4, $a3
+	#Has greatest value
+	li $v0, 1	#to print an integer is 1
+	addi $a0, $t1, 0  #moves the greater integer stored in v1 to argument 
+	syscall
+	
+	#Display + between numbers
+	li $v0, 4	#text
+	la $a0, plus
+	syscall
+	
+	#has smaller value
+	li $v0, 1
+	addi $a0, $t2, 0
+	syscall
+	
+	#print the equal
+	li $v0, 4
+	la $a0, equal
+	syscall
+	#print the sum of both values
+	li $v0, 1
+	addi $a0, $t4, 0
+	syscall
+	
+	#syscall to end program
+	li $v0, 10
+	syscall
+	
+sortValues: 
+	#sort from great to least
+	bgt $a1, $a2, greater #a1 is greater so move to v1
+	add $a3, $a1, $a2 #add values
+	move $v1, $a2 #if a2 is greater move to v1
+	move $v0, $a1	
+	jr $ra
+greater:
+	add $a3, $a1, $a2 #add values
+	move $v1, $a1 #al is greater value so moved into v1
+	move $v0, $a2 #smaller value moved into v0
+	jr $ra
